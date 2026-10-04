@@ -2,6 +2,8 @@
 
 ## Identificação
 
+**Grupo:** ROTA
+
 | Integrante | RM | Turma |
 |---|---|---|
 | Letícia Gabrielle Andrade Temóteo | 563985 | 2CCPG |
@@ -13,7 +15,7 @@
 | Campo | |
 |---|---|
 | **Total de bugs corrigidos** | 12 / 12 |
-| **Total de ajustes de Clean Code** | 6 / 6 |
+| **Total de ajustes de Clean Code** | 6 / 6 (+2 extras: clean07 e clean08) |
 | **Total de testes novos escritos** | 6 / 6 |
 | **Suíte final (Run As → JUnit Test)** | 26 testes, 0 falhas, 0 erros, 0 ignorados — validado com `mvn clean verify` |
 
@@ -21,20 +23,22 @@
 
 ## Parte 1 — Bugs encontrados
 
-| # | Sintoma observado | Causa raiz | Correção aplicada | Conceito da disciplina |
+> As linhas indicadas na causa raiz referem-se ao código original recebido (commit `chore: estado original do projeto recebido`).
+
+| # | Sintoma observado | Causa raiz (arquivo e linha aproximada) | Correção aplicada | Conceito da disciplina |
 |---|---|---|---|---|
-| bug01 | O Builder montava atendimento com nome do pet `null`. | `AtendimentoBuilder.comPet`: `petNome = petNome` alterava apenas o parâmetro. | Alterado para `this.petNome = petNome`. | Encapsulamento / uso de `this` |
-| bug02 | Builder aceitava atendimento sem nome ou sem porte. | `AtendimentoBuilder.construir` não validava campos obrigatórios. | Adicionadas validações fail fast para nome e porte. | Exceções / Fail Fast / Builder |
-| bug03 | `TOSA` criava um `Banho`. | `AtendimentoFactory`: case `TOSA` instanciava `Banho`. | Factory passa a instanciar `Tosa`. | Factory / Polimorfismo |
-| bug04 | Consulta era criada sem os dados recebidos. | Construtor de `ConsultaVeterinaria` chamava `super()` vazio. | Passagem dos argumentos para o construtor da superclasse. | Herança / construtores |
-| bug05 | `getInstancia()` não mantinha uma única instância e a sequência reiniciava. | Singleton criava `new GeradorProtocolo()` sem guardar em `instancia`. | Criada instância única estática e `proximo()` sincronizado. | Singleton |
-| bug06 | Conflito do mesmo pet e horário não era detectado. | `AgendaService.agendar` comparava `String` e `LocalDateTime` com `==`. | Troca por `.equals()`. | Igualdade de objetos |
-| bug07 | Busca por ID inexistente retornava `null`. | `AgendaService.buscarPorId` capturava qualquer exceção e a engolia. | Removido `catch` genérico; `AtendimentoNaoEncontradoException` passa a propagar. | Exceções específicas |
-| bug08 | Preço de banho pequeno/grande estava invertido. | `Banho.calcularPreco` retornava 100 para PEQUENO e 60 no fallback. | Corrigido para 60/80/100. | Polimorfismo / regra de negócio |
-| bug09 | Tosa retornava duração herdada de 30 min. | Método `getDuracaoMinutos(String)` era sobrecarga, não sobrescrita. | Alterado para `getDuracaoMinutos()` com `@Override`. | Override vs overload |
-| bug10 | Era possível agendar atendimento no passado. | `AgendaService.agendar` não validava data/hora antes do repositório. | Adicionada validação com `IllegalArgumentException` antes de qualquer consulta. | Fail Fast / regra de negócio |
-| bug11 | Atendimento concluído ou cancelado podia ser cancelado novamente. | `Atendimento.cancelar` mudava o status sem validar o estado atual. | Agora só `AGENDADO` pode virar `CANCELADO`; demais lançam `StatusInvalidoException`. | Máquina de estados / exceções |
-| bug12 | Entidade nova podia chegar ao JPA sem estratégia de geração de ID. | Campo `id` tinha apenas `@Id`. | Adicionado `@GeneratedValue(strategy = GenerationType.IDENTITY)`. | JPA / persistência |
+| bug01 | O Builder montava atendimento com nome do pet `null`. | `AtendimentoBuilder.comPet`: `petNome = petNome` alterava apenas o parâmetro. (`AtendimentoBuilder.java`, ~L24) | Alterado para `this.petNome = petNome`. | Encapsulamento / uso de `this` |
+| bug02 | Builder aceitava atendimento sem nome ou sem porte. | `AtendimentoBuilder.construir` não validava campos obrigatórios. (`AtendimentoBuilder.java`, ~L39–43) | Adicionadas validações fail fast para nome e porte; removido o comentário que delegava essa validação ao controller. | Exceções / Fail Fast / Builder |
+| bug03 | `TOSA` criava um `Banho`. | `AtendimentoFactory`: case `TOSA` instanciava `Banho`. (`AtendimentoFactory.java`, ~L17) | Factory passa a instanciar `Tosa`. | Factory / Polimorfismo |
+| bug04 | Consulta era criada sem os dados recebidos. | Construtor de `ConsultaVeterinaria` chamava `super()` vazio. (`ConsultaVeterinaria.java`, ~L17) | Passagem dos argumentos para o construtor da superclasse. | Herança / construtores |
+| bug05 | `getInstancia()` não mantinha uma única instância e a sequência reiniciava. | Singleton criava `new GeradorProtocolo()` sem guardar em `instancia`. (`GeradorProtocolo.java`, ~L17–21) | Criada instância única estática e `proximo()` sincronizado. | Singleton |
+| bug06 | Conflito do mesmo pet e horário não era detectado. | `AgendaService.agendar` comparava `String` e `LocalDateTime` com `==`. (`AgendaService.java`, ~L23) | Troca por `.equals()`. | Igualdade de objetos |
+| bug07 | Busca por ID inexistente retornava `null`. | `AgendaService.buscarPorId` capturava qualquer exceção e a engolia. (`AgendaService.java`, ~L37–42) | Removido `catch` genérico; `AtendimentoNaoEncontradoException` passa a propagar. | Exceções específicas |
+| bug08 | Preço de banho pequeno/grande estava invertido. | `Banho.calcularPreco` retornava 100 para PEQUENO e 60 no fallback. (`Banho.java`, ~L26–33) | Corrigido para 60/80/100. | Polimorfismo / regra de negócio |
+| bug09 | Tosa retornava duração herdada de 30 min. | Método `getDuracaoMinutos(String)` era sobrecarga, não sobrescrita. (`Tosa.java`, ~L40) | Alterado para `getDuracaoMinutos()` com `@Override`. | Override vs overload |
+| bug10 | Era possível agendar atendimento no passado. | `AgendaService.agendar` não validava data/hora antes do repositório. (`AgendaService.java`, ~L20–21) | Adicionada validação com `IllegalArgumentException` antes de qualquer consulta. | Fail Fast / regra de negócio |
+| bug11 | Atendimento concluído ou cancelado podia ser cancelado novamente. | `Atendimento.cancelar` mudava o status sem validar o estado atual. (`Atendimento.java`, ~L63–65) | Agora só `AGENDADO` pode virar `CANCELADO`; demais lançam `StatusInvalidoException`. | Máquina de estados / exceções |
+| bug12 | Entidade nova podia chegar ao JPA sem estratégia de geração de ID. | Campo `id` tinha apenas `@Id`. (`Atendimento.java`, ~L14–15) | Adicionado `@GeneratedValue(strategy = GenerationType.IDENTITY)`. | JPA / persistência |
 
 ## Parte 2 — Ajustes de Clean Code
 
@@ -46,6 +50,8 @@
 | clean04 | `GeradorProtocolo` | `System.out.println` de depuração dentro da classe de domínio. | Removida saída de console. |
 | clean05 | `AgendaService.agendar` | Regra de negócio misturada com impressão de recibo no console. | Removido `System.out.println`; método apenas executa a regra. |
 | clean06 | `AtendimentoController` | Código morto/YAGNI: método de fidelidade futura não utilizado. | Removido `calcularDescontoFidelidade`. |
+| clean07 (extra) | `AtendimentoController.agendar` | Comentário enganoso/desatualizado: indicava só `tutorNome` como parâmetro e o exemplo usava uma data já no passado. | Comentário descreve todos os parâmetros e o exemplo usa data futura. |
+| clean08 (extra) | `Atendimento` e `AgendaService.agendar` | Strings mágicas repetidas (`"AGENDADO"`, `"CONCLUIDO"`, `"CANCELADO"`). | Criadas as constantes `STATUS_AGENDADO`, `STATUS_CONCLUIDO` e `STATUS_CANCELADO`, usadas no lugar dos literais. |
 
 ## Parte 3 — Testes novos
 
@@ -85,6 +91,8 @@ Os testes que já nasceram verdes continuam úteis porque registram uma regra e 
 ## Parte 5 — Espaço livre
 
 Projeto corrigido preservando a estrutura original, sem alterar os 20 testes fornecidos. Foram adicionados somente os 6 testes exigidos pelo checkpoint.
+
+Sobre o Clean Code: clean02 e clean03 aplicam o mesmo princípio (injeção por construtor) em classes diferentes, por isso registramos dois ajustes extras (clean07 e clean08). Além disso, o comentário enganoso do `AtendimentoBuilder` ("a validação dos campos obrigatórios fica por conta do controller") foi removido junto com a correção do bug02, já que a validação passou a ficar no `construir()`.
 
 ## Validação final
 
