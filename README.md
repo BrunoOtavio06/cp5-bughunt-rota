@@ -17,7 +17,7 @@
 | **Total de bugs corrigidos** | 12 / 12 |
 | **Total de ajustes de Clean Code** | 6 / 6 (+2 extras: clean07 e clean08) |
 | **Total de testes novos escritos** | 6 / 6 |
-| **Suíte final (Run As → JUnit Test)** | 26 testes, 0 falhas, 0 erros, 0 ignorados — validado com `mvn clean verify` |
+| **Suíte final (Run As → JUnit Test)** | 26 testes, 0 falhas |
 
 ---
 
@@ -93,9 +93,3 @@ Os testes que já nasceram verdes continuam úteis porque registram uma regra e 
 Projeto corrigido preservando a estrutura original, sem alterar os 20 testes fornecidos. Foram adicionados somente os 6 testes exigidos pelo checkpoint.
 
 Sobre o Clean Code: clean02 e clean03 aplicam o mesmo princípio (injeção por construtor) em classes diferentes, por isso registramos dois ajustes extras (clean07 e clean08). Além disso, o comentário enganoso do `AtendimentoBuilder` ("a validação dos campos obrigatórios fica por conta do controller") foi removido junto com a correção do bug02, já que a validação passou a ficar no `construir()`.
-
-## Validação final
-
-Em 28/09/2026, a execução de `mvn clean verify` terminou com **BUILD SUCCESS**: 26 testes aprovados e JAR gerado. Ambiente: Maven 3.9.9 e OpenJDK 21.0.9, com compilação configurada para Java 17 no `pom.xml`.
-
-Para repetir a validação, execute `mvn clean verify` na raiz do projeto com JDK 17 ou superior e Maven instalados. Os testes são unitários e não dependem do Oracle. A conexão real com o Oracle não foi validada; `application.properties` mantém apenas os placeholders `SEU_RM` e `SUA_SENHA`. Para executar a API com Oracle, forneça as credenciais localmente pelas variáveis de ambiente `SPRING_DATASOURCE_USERNAME` e `SPRING_DATASOURCE_PASSWORD`, sem versionar segredos.
